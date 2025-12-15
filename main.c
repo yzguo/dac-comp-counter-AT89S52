@@ -9,25 +9,23 @@ char rbuf[5];
 
 void Delay_ms(unsigned int ms)
 {
-  unsigned int i, j;
-  for(i = 0; i < ms; i++)
+	unsigned int i, j;
+	for(i = 0; i < ms; i++)
     for(j = 0; j < 113; j++);  // 123 for 12M, 113.36 for 11.0592M
 }
 
 void hiccup()
 {
-  _nop_();
+	_nop_();
 }
 
-/*
-void UART_Init(int baudrate)
+/* void UART_Init(int baudrate)
 {
 	SCON = 0x50;  // Asynchronous mode, 8-bit data and 1-stop bit
 	TMOD = 0x20;  // Timer1 in Mode2.
 	TH1 = 256 - (11059200UL)/(long)(32*12*baudrate); // Load timer value for baudrate generation
 	TR1 = 1;      // Turn ON the timer for Baud rate generation
-}
-*/
+} */
 
 void UART_Init(void)
 {
@@ -112,7 +110,7 @@ void set_DAC(uchar channel, u16 value)
 	value |= ((u16)channel) << 15;
 	value |= 0x3000;
 	for(i = 16; i-- > 0; )
-  {
+	{
 		// hiccup();
 		DACSDI = (value >> i) & 1;
 		hiccup();
@@ -162,6 +160,21 @@ u32 get_count()
 	return result;
 }
 
+void run_stepper(u16 num, char dir)
+{
+	STEPENA_ = 0;
+	if (dir == 'X' || dir == 'x') STEPDIR_ = 0;
+	if (dir == 'Y' || dir == 'y') STEPDIR_ = 1;
+	for(; num-- > 0; )
+	{
+		STEPPUL_ = 0;
+		hiccup();
+		STEPPUL_ = 1;
+		hiccup();
+	}
+	STEPENA_ = 1;
+}
+
 void main()
 {
 	uchar i, a[]={"UART Initialization!"};
@@ -183,33 +196,84 @@ void main()
 	STEPDIR_ = 1;
 	STEPENA_ = 1;
 
-	UART_Init();  //Initialize the UART module
+	UART_Init();  // Initialize the UART module
 	for(i = 0; a[i] != 0; i++)
 	{
 		UART_TxChar(a[i]);  // Transmit predefined string
 	}
 
-  while(1)
+	while(1)
 	{
-		/* for(i = 0; i < 10; i++)
+		for(i = 0; i < 5; i++)
 		{
 			rbuf[i] = UART_RxChar();
-			if (rbuf[i] = '\n') break;
-		} */
-		
-		
-		
-		for(val = 0; val < 256; val++)
+			if (rbuf[i] == '\n') break;
+		}
+
+		if (rbuf[0] == 'R' || rbuf[0] == 'r')
 		{
+			UART_TxChar('#');
+			UART_TxChar('\n');
+			for(val = 0; val < 256; val++)
+			{
+				set_DAC(0, val);
+				Delay_ms(1);
+				result = get_count();
+				printLong(val);
+				UART_TxChar(' ');
+				printLong(result);
+				UART_TxChar('\n');
+			}
+		}
+		
+		if (rbuf[0] == 'S' || rbuf[0] == 's')
+		{
+			if (rbuf[1] >= '0' && rbuf[1] <= '9') 
+			{
+				val = 16 * (rbuf[1] - '0');
+			} else if (rbuf[1] >= 'A' && rbuf[1] <= 'F') {
+				val = 16 * (rbuf[1] - 'A' + 10);
+			} else if (rbuf[1] >= 'a' && rbuf[1] <= 'f') {
+				val = 16 * (rbuf[1] - 'a' + 10);
+			}
+			if (rbuf[2] >= '0' && rbuf[2] <= '9') 
+			{
+				val += rbuf[2] - '0';
+			} else if (rbuf[1] >= 'A' && rbuf[1] <= 'F') {
+				val += rbuf[2] - 'A' + 10;
+			} else if (rbuf[1] >= 'a' && rbuf[1] <= 'f') {
+				val += rbuf[2] - 'a' + 10;
+			}
 			set_DAC(0, val);
 			Delay_ms(1);
 			result = get_count();
+			UART_TxChar('#');
+			UART_TxChar('\n');
 			printLong(val);
 			UART_TxChar(' ');
 			printLong(result);
 			UART_TxChar('\n');
 		}
-		UART_TxChar('#');
-		UART_TxChar('\n');
+		
+		if (rbuf[0] == 'P' || rbuf[0] == 'p')
+		{
+			if (rbuf[1] >= '0' && rbuf[1] <= '9') 
+			{
+				val = 16 * (rbuf[1] - '0');
+			} else if (rbuf[1] >= 'A' && rbuf[1] <= 'F') {
+				val = 16 * (rbuf[1] - 'A' + 10);
+			} else if (rbuf[1] >= 'a' && rbuf[1] <= 'f') {
+				val = 16 * (rbuf[1] - 'a' + 10);
+			}
+			if (rbuf[2] >= '0' && rbuf[2] <= '9') 
+			{
+				val += rbuf[2] - '0';
+			} else if (rbuf[1] >= 'A' && rbuf[1] <= 'F') {
+				val += rbuf[2] - 'A' + 10;
+			} else if (rbuf[1] >= 'a' && rbuf[1] <= 'f') {
+				val += rbuf[2] - 'a' + 10;
+			}
+			run_stepper(val, rbuf[3]);
+		}
 	}
 }
