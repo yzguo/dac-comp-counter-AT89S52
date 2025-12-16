@@ -7,6 +7,7 @@
 3. run stepper tick from 0 to 255
 4. all num should be hexadecimal, 十六进制
 5. all input ignore case, 忽略大小写
+6. stepper PUL_ P3.2, DIR_ = P3.3, ENA_ = P3.4;
 
 ## Interfaces
 
@@ -36,4 +37,4 @@ UART input like `S10\n` or `s10\n`, output count number with voltage level 16 wi
 
 ```
 
-UART input like `PX10\n` or `py10\n`, the stepper will run 16 ticks with `X/x` and `Y/y` for different directions.
+UART input like `P10X\n` or `p10y\n`, the stepper will run 16 ticks with `X/x` and `Y/y` for different directions.
