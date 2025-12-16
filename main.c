@@ -197,10 +197,6 @@ void main()
 	STEPENA_ = 1;
 
 	UART_Init();  // Initialize the UART module
-	for(i = 0; a[i] != 0; i++)
-	{
-		UART_TxChar(a[i]);  // Transmit predefined string
-	}
 
 	while(1)
 	{
@@ -208,6 +204,14 @@ void main()
 		{
 			rbuf[i] = UART_RxChar();
 			if (rbuf[i] == '\n') break;
+		}
+
+		if (rbuf[0] == 'I' || rbuf[0] == 'i')
+		{
+			for(i = 0; a[i] != 0; i++)
+			{
+				UART_TxChar(a[i]);  // Transmit predefined string
+			}
 		}
 
 		if (rbuf[0] == 'R' || rbuf[0] == 'r')
