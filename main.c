@@ -99,6 +99,7 @@ sbit DACLDAC_ = P1^0;
 sbit STEPPUL_ = P3^2;
 sbit STEPDIR_ = P3^3;
 sbit STEPENA_ = P3^4;
+sbit ZERO = P3^5;
 
 void set_DAC(uchar channel, u16 value)
 {
@@ -177,7 +178,7 @@ void run_stepper(u16 num, char dir)
 
 void main()
 {
-	uchar i, a[]={"UART Initialization!"};
+	uchar i, codetime[]={__DATE__ " " __TIME__ "\n"};
 	u16 val = 0;
 	u32 result = 0;
 	
@@ -195,6 +196,8 @@ void main()
 	STEPPUL_ = 1;
 	STEPDIR_ = 1;
 	STEPENA_ = 1;
+	
+	ZERO = 1;
 
 	UART_Init();  // Initialize the UART module
 
@@ -205,30 +208,41 @@ void main()
 			rbuf[i] = UART_RxChar();
 			if (rbuf[i] == '\n') break;
 		}
+		
+		if (rbuf[0] == 'V' || rbuf[0] == 'v')
+		{
+			for (i = 0; codetime[i] != 0; ++i)
+			{
+				UART_TxChar(codetime[i]);
+			}
+		}
 
 		if (rbuf[0] == 'I' || rbuf[0] == 'i')
 		{
-			for(i = 0; a[i] != 0; i++)
+			while(ZERO != 0)
 			{
-				UART_TxChar(a[i]);  // Transmit predefined string
+				run_stepper(1, 'y');
 			}
+			UART_TxChar('O');
+			UART_TxChar('K');
 			UART_TxChar('\n');
 		}
 
 		if (rbuf[0] == 'R' || rbuf[0] == 'r')
 		{
-			UART_TxChar('#');
-			UART_TxChar('\n');
 			for(val = 0; val < 256; val++)
 			{
 				set_DAC(0, val);
 				Delay_ms(1);
 				result = get_count();
 				printLong(val);
-				UART_TxChar(' ');
+				UART_TxChar(',');
 				printLong(result);
-				UART_TxChar('\n');
+				UART_TxChar(';');
 			}
+			UART_TxChar('x');
+			UART_TxChar(';');
+			UART_TxChar('\n');
 		}
 		
 		if (rbuf[0] == 'S' || rbuf[0] == 's')
@@ -252,10 +266,8 @@ void main()
 			set_DAC(0, val);
 			Delay_ms(1);
 			result = get_count();
-			UART_TxChar('#');
-			UART_TxChar('\n');
 			printLong(val);
-			UART_TxChar(' ');
+			UART_TxChar(',');
 			printLong(result);
 			UART_TxChar('\n');
 		}
@@ -279,6 +291,9 @@ void main()
 				val += rbuf[2] - 'a' + 10;
 			}
 			run_stepper(val, rbuf[3]);
+			UART_TxChar('O');
+			UART_TxChar('K');
+			UART_TxChar('\n');
 		}
 	}
 }
