@@ -212,6 +212,7 @@ void main()
 			{
 				UART_TxChar(a[i]);  // Transmit predefined string
 			}
+			UART_TxChar('\n');
 		}
 
 		if (rbuf[0] == 'R' || rbuf[0] == 'r')

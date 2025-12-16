@@ -10,6 +10,13 @@
 
 ## Interfaces
 
+UART input like `I\n` or `i\n`, output with format as follows:
+
+```plain
+UART Initialization!
+
+```
+
 UART input like `R\n` or `r\n`, output count number from voltage level 0 to 255 with format as follows:
 
 ```plain
