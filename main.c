@@ -168,9 +168,9 @@ void run_stepper(u16 num, char dir)
 	for(; num-- > 0; )
 	{
 		STEPPUL_ = 0;
-		hiccup();
+		Delay_ms(1);
 		STEPPUL_ = 1;
-		hiccup();
+		Delay_ms(1);
 	}
 	STEPENA_ = 1;
 }
