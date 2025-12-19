@@ -255,14 +255,16 @@ void main()
 			} else if (rbuf[1] >= 'a' && rbuf[1] <= 'f') {
 				val = 16 * (rbuf[1] - 'a' + 10);
 			}
+			
 			if (rbuf[2] >= '0' && rbuf[2] <= '9') 
 			{
 				val += rbuf[2] - '0';
-			} else if (rbuf[1] >= 'A' && rbuf[1] <= 'F') {
+			} else if (rbuf[2] >= 'A' && rbuf[2] <= 'F') {
 				val += rbuf[2] - 'A' + 10;
-			} else if (rbuf[1] >= 'a' && rbuf[1] <= 'f') {
+			} else if (rbuf[2] >= 'a' && rbuf[2] <= 'f') {
 				val += rbuf[2] - 'a' + 10;
 			}
+			
 			set_DAC(0, val);
 			Delay_ms(1);
 			result = get_count();
@@ -285,9 +287,9 @@ void main()
 			if (rbuf[2] >= '0' && rbuf[2] <= '9') 
 			{
 				val += rbuf[2] - '0';
-			} else if (rbuf[1] >= 'A' && rbuf[1] <= 'F') {
+			} else if (rbuf[2] >= 'A' && rbuf[2] <= 'F') {
 				val += rbuf[2] - 'A' + 10;
-			} else if (rbuf[1] >= 'a' && rbuf[1] <= 'f') {
+			} else if (rbuf[2] >= 'a' && rbuf[2] <= 'f') {
 				val += rbuf[2] - 'a' + 10;
 			}
 			run_stepper(val, rbuf[3]);
