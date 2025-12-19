@@ -9,7 +9,8 @@
 5. all input ignore case, 忽略大小写
 6. stepper PUL_ P3.2, DIR_ = P3.3, ENA_ = P3.4
 7. ZERO = P3.5, 复位信号, 光电门被挡住时为 0
-8. X 上移, Y 下移, 零位在下方
+8. X 上移(红), Y 下移(蓝), 零位在下方(蓝)
+9. 波长(nm)和步进电机(tick)的关系: $y=40.018x-232.37$
 
 ## Interfaces
 
